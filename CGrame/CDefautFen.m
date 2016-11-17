@@ -1,7 +1,7 @@
 %
 % Classe CDefautFen
 %
-% Classe de base pour gérer une Fenêtre
+% Classe de base pour gÃ©rer une FenÃªtre
 % tO --> thisObj
 %
 % methods
@@ -9,33 +9,41 @@
 %   fenVisible(tO, etat)
 %   togglevoir(tO, src, event)
 %
+
 classdef CDefautFen < handle
+
   properties
-    fig;                   % handle de la figure
-  end  %properties
-  %------
+    fig =[];                   % handle de la figure
+  end
+
   methods
+
     %___________________________________
-    % rend la fenêtre invisible
-    % sans la détruire
-    %-------
+    % rend la fenÃªtre invisible
+    % sans la dÃ©truire
+    %---------------------------------
     function disparait(tO, src, event)
       set(tO.fig, 'visible','off');
     end
+
     %___________________________________
-    % En fonction du paramètre "etat"
-    % affiche ou non la fenêtre
-    %-------
+    % En fonction du paramÃ¨tre "etat"
+    % affiche ou non la fenÃªtre
+    %----------------------------
     function fenVisible(tO, etat)
       set(tO.fig, 'visible',etat);
     end
+
     %___________________________________
-    % Peut être utilisé avec un bouton
-    % pour toggler la visibilité de la fenêtre
-    %-------
+    % Peut Ãªtre utilisÃ© avec un bouton
+    % pour toggler la visibilitÃ© de la fenÃªtre
+    %----------------------------------
     function togglevoir(tO, src, event)
+      % On commence par lire l'Ã©tat de la fenÃªtre
       ss =CEOnOff.(get(tO.fig,'visible'));
+      % puis on lui Set l'Ã©tat contraire
       set(tO.fig, 'visible',char(CEOnOff(~ss)));
     end
+
   end  % methods
 end
