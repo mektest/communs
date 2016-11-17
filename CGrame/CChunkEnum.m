@@ -1,3 +1,8 @@
+%
+% Cette énumération sert pour lire les fichiers AVI lorsque les readers normaux ont de la "misère"
+%
+% voir la description du contenu d'un fichier AVI
+%
 classdef CChunkEnum < uint32
   enumeration
     RIFF      (1179011410)
