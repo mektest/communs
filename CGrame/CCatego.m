@@ -1,38 +1,48 @@
 %
 % Classe CCatego
 %
+% Pour travailler avec des classements de niveaux et catÃ©gories
 %
+% STRUCTURE CATEGO
 % catego(1,niveau,1)
 %                   .nom     -> nom du niveau
 %                   .ess(n)  -> 1 si l'essai  n  est encore disponible dans ce niveau
-%                   .ncat    -> Nb de catégorie pour ce niveau
+%                   .ncat    -> Nb de catÃ©gorie pour ce niveau
 %                   .ness    -> Nb d'essai encore disponible pour ce niveau
-% catego(2,niveau,catégorie)
-%                   .nom     -> nom de la catégorie
-%                   .ess(n)  -> 1 si l'essai  n  appartient à cette catégorie
-%                   .ncat    -> Nb d'essai dans cette catégorie
+% catego(2,niveau,catÃ©gorie)
+%                   .nom     -> nom de la catÃ©gorie
+%                   .ess(n)  -> 1 si l'essai  n  appartient Ã  cette catÃ©gorie
+%                   .ncat    -> Nb d'essai dans cette catÃ©gorie
 %
+
 classdef CCatego < handle
   properties
-    Dato;           % Conteneur de la structure Catego
-    hF;             % handle du fichier analyse
+    Dato =[];           % Conteneur de la structure Catego
+    hF =[];             % handle du fichier analyse
   end %properties
   %------
   methods
-    %-------
+
+    %------------------------------
+    % Getter pour la propriÃ©tÃ© Dato
+    %-------------------------
     function ss =get.Dato(obj)
       ss =obj.Dato;
     end
-    %-------
+
+    %------------------------------------
+    % Cato doit Ãªtre une Structure CATEGO
+    %--------------------------
     function initial(obj, Cato)
       if isa(Cato, 'struct')
         obj.Dato =Cato;
       end
     end
+
     %--------------------------------
-    % Retourne le nom de la catégorie
-    % à partir du niveau demandé pour l'essai ess
-    %-------
+    % Retourne le nom de la catÃ©gorie
+    % Ã  partir du niveau demandÃ© pour l'essai ess
+    %----------------------------------------
     function v =getNomCatego(obj, leniv, ess)
       n =obj.getNumeroCatego(leniv, ess);
       v =[];
@@ -40,10 +50,11 @@ classdef CCatego < handle
         v =strtrim(obj.Dato(2, leniv, n).nom);
       end
     end
+
     %-----------------------------------
-    % Retourne le numéro de la catégorie
-    % à partir du niveau demandé pour l'essai ess
-    %-------
+    % Retourne le numÃ©ro de la catÃ©gorie
+    % Ã  partir du niveau demandÃ© pour l'essai ess
+    %-------------------------------------------
     function v =getNumeroCatego(obj, leniv, ess)
       v =[];
       if ~isempty(leniv) && ~isempty(ess) && leniv > 0 && ess > 0
@@ -57,7 +68,8 @@ classdef CCatego < handle
         end
       end
     end
-    %-------
+
+    %-----------------------------
     function EnleveEssai(obj, ess)
       vg =obj.hF.Vg;
       for U =1:vg.niveau
@@ -69,7 +81,8 @@ classdef CCatego < handle
         end
       end
     end
-    %-------
+
+    %-----------------------------
     function RebatirCategorie(obj)
       vg =obj.hF.Vg;
       hdchnl =obj.hF.Hdchnl;
@@ -81,9 +94,9 @@ classdef CCatego < handle
       obj.Dato(1,1,1).nom ='Stimulus';
       % On s'assure que les stimulus sont uniques
       obj.hF.StimulusUnique();
-      % les essais non-assignés seront classés "bidon"
+      % les essais non-assignÃ©s seront classÃ©s "bidon"
       obj.hF.StimEssVideBidon();
-   	  % on transforme les Stimulus en CATÉGORIES
+   	  % on transforme les Stimulus en CATÃ‰GORIES
       if vg.nst
         vg.niveau = 1;
         vg.affniv =0;
@@ -104,14 +117,15 @@ classdef CCatego < handle
       end % if vg.nst
       vg.sauve =true;
     end
-    %-------
+
+    %------------------------------------------------
     function lessai =BatirListeEssaiLibre(obj, leniv)
-      % Sert à bâtir la liste des essais à associer à une catégorie
+      % Sert Ã  bÃ¢tir la liste des essais Ã  associer Ã  une catÃ©gorie
       % pour le niveau "leniv"
       %
       lessai ='0 -  -';
       vg =obj.hF.Vg;
-      if vg.niveau & obj.Dato(1,leniv,1).ness
+      if vg.niveau && obj.Dato(1,leniv,1).ness
         % On cherche les essais disponibles dans ce niveau
         hdchnl =obj.hF.Hdchnl;
         edispo =find(obj.Dato(1,leniv,1).ess);
@@ -127,7 +141,7 @@ classdef CCatego < handle
           end
           if nono
           	lestim =hdchnl.numstim(edispo(i));
-            if vg.nst & lestim & lestim <= vg.nst
+            if vg.nst && lestim && lestim <= vg.nst
               lessai{end+1} =[num2str(edispo(i)) '-' vg.nomstim{lestim}];
             else
               lessai{end+1} =[num2str(edispo(i)) '- - -'];
@@ -136,14 +150,15 @@ classdef CCatego < handle
         end  %for i=1:size(edispo)
       end
     end
-    %-------
+
+    %----------------------------------------------------------
     function lessaib =BatirListeEssaiAssocie(obj, leniv, lacat)
-      % Sert à bâtir la liste des essais associer à la catégorie
+      % Sert Ã  bÃ¢tir la liste des essais associer Ã  la catÃ©gorie
       % "lacat" du niveau "leniv"
       lessaib ='0';
-      % On vérifie que l'on a bien des essais dans cet CAT
+      % On vÃ©rifie que l'on a bien des essais dans cet CAT
       vg =obj.hF.Vg;
-      if vg.niveau & lacat <= obj.Dato(1,leniv,1).ncat  & obj.Dato(2,leniv,lacat).ncat
+      if vg.niveau && lacat <= obj.Dato(1,leniv,1).ncat  && obj.Dato(2,leniv,lacat).ncat
         hdchnl =obj.hF.Hdchnl;
         easso =find(obj.Dato(2,leniv,lacat).ess);
         lessaib ={};
@@ -158,7 +173,7 @@ classdef CCatego < handle
           end
           if nono
           	lestim =hdchnl.numstim(easso(i));
-            if vg.nst & lestim & lestim <= vg.nst
+            if vg.nst && lestim && lestim <= vg.nst
               lessaib{end+1} =[num2str(easso(i)) '-' vg.nomstim{lestim}];
             else
               lessaib{end+1} =[num2str(easso(i)) '- - -'];
@@ -167,7 +182,8 @@ classdef CCatego < handle
         end  %for j =1:size(easso)
       end
     end
-    %-------
+
+    %--------------------
     function Majstim(obj)
       vg =obj.hF.Vg;
       hdchnl =obj.hF.Hdchnl;
