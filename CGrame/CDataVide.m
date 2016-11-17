@@ -1,13 +1,13 @@
 %
 % Class CDataVide
 %
-% Objet utile lorsque l'on a à passer des datas d'une fonction
-% à l'autre sans vouloir jouer avec des variables "global".
+% Objet utile lorsque l'on a Ã  passer des datas d'une fonction
+% Ã  l'autre sans vouloir jouer avec des variables "global".
 %
 classdef CDataVide < handle
   %---------
   properties
-    D;            % variable vide qui pourra être utilisé au besoin
-    cur;
+    D =[];            % variable vide qui pourra Ãªtre utilisÃ© au besoin
+    cur =[];
   end
 end
