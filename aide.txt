@@ -1,0 +1,50 @@
+  OA =CAnalyse.getInstance();
+  Ofich =OA.findcurfich();
+  hdchnl =Ofich.Hdchnl;
+  vg =Ofich.Vg;
+
+  lapos =positionfen('G','H',large,haut);
+
+  dtchnl =CDtchnl();
+
+  Ofich.getcanal(j,dtchnl);
+  Ofich.setcanal(j,dtchnl);
+
+  hdchnl.duplic([canx cany]);
+
+  ptchnl.identifie(debinterv,Can(ii),jj);
+
+  OA.OFig.affiche();
+
+  hdchnl.max(i,j) =max(dt.Dato(1:hdchnl.nsmpls(i,j),j));
+  hdchnl.min(i,j) =min(dt.Dato(1:hdchnl.nsmpls(i,j),j));
+
+  {***** À propos des CListBox1-2 *****}
+  if vg.nad>2;letop=vg.nad;else letop=vg.nad+1;end
+  set(findobj('Type','uicontrol','tag', 'IpCanLesnoms'),'String',vg.lesnoms,'Max',letop);
+
+  OA =CAnalyse.getInstance();
+  Ofich =OA.findcurfich();
+  eltexto =Ofich.Hdchnl.adname;
+  OA.OFig.cano.updatestring(eltexto);
+
+
+
+double(' 0   9    A   Z     a    z')
+                                  
+        48  57   65  90    97  122
+
+
+%
+% catego(1,niv,1)
+%               .nom     -> nom du niveau
+%               .ess(n)  -> 1 si l'essai  n  est encore disponible dans ce niveau
+%               .ncat    -> Nb de catégorie pour ce niveau
+%               .ness    -> Nb d'essai encore disponible pour ce niveau
+% catego(2,niv,cat)
+%               .nom     -> nom de la catégorie
+%               .ess(n)  -> 1 si l'essai  n  appartient à cette catégorie
+%               .ncat    -> Nb d'essai dans cette catégorie
+%
+% Attention: size(catego(i,j,k).ess) => [foo 1]
+%
