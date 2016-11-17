@@ -1,4 +1,6 @@
 %
+%                              Classe de base pour les figures
+%
 % classdef CBasePourFigure < handle
 %
 % METHODS
@@ -16,25 +18,25 @@ classdef CBasePourFigure < handle
   methods
     %-------
     function delete(tO)                 % DESTRUCTOR
-      if ~isempty(tO.fig) & ishandle(tO.fig)
+      if ~isempty(tO.fig) && ishandle(tO.fig)
         delete(tO.fig);
       end
     end
     %_____________________________________________
-    % On ramène le focus sur la figure principale
-    %-------
+    % On ramÃ¨ne le focus sur la figure principale
+    %---------------------------------------------
     function figFocus(tO)
       figure(tO.fig);
     end
     %_____________________________________________
-    % On garde le focus 'gelé' sur la fenêtre
-    %-------
+    % On garde le focus 'gelÃ©' sur la fenÃªtre
+    %---------------------------------------------
     function setFigModal(tO)
       set(tO.fig, 'WindowStyle','modal');
     end
     %_____________________________________________
-    % On 'dégèle' sur la fenêtre
-    %-------
+    % On 'dÃ©gÃ¨le' le focus de la fenÃªtre
+    %---------------------------------------------
     function setFigNormal(tO)
       set(tO.fig, 'WindowStyle','normal');
     end
