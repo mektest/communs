@@ -1,64 +1,75 @@
 %
 % classdef CParamMark < handle
 %
+% Classe utilisÃ© pour travailler avec le GUI du marquage automatisÃ©
+%
 % METHODS
 %
+
 classdef CParamMark < handle
- %__________
+
   properties (SetAccess =protected)
     canSrc =1;                  % canal source
     canDst =1;                  % canal destination
-    canExtra =1;                % canal pour la copie des points à marquer
+    canExtra =1;                % canal pour la copie des points Ã  marquer
     parEss =false;              % on choisi les Ess ou Cat
-    allTri =[];                 % essai pour le marquage
-    multiaff;
-    affniv;
-    tri;                        % essai pour l'affichage
+    allTri =[];                 % essai sÃ©lectionnÃ© pour le marquage
+    multiaff =[];
+    affniv =[];
+    tri =[];                    % essai pour l'affichage
   end
- %_______
+
   methods
-   %________
+
+    %_____________________________________________________
+    %                        SETTER
+    %------------------------
     function setCanSrc(tO, v)
       tO.canSrc =v;
     end
-   %________
+    %_________________________
     function setCanDst(tO, v)
       tO.canDst =v;
     end
-   %________
+    %__________________________
     function setCanExtra(tO, v)
       tO.canExtra =v;
     end
-   %________
+    %________________________
     function setParEss(tO, v)
       tO.parEss =v;
     end
-   %________
+    %________________________
     function setAllTri(tO, v)
       tO.allTri =v;
     end
-   %________
+    %________________________
     function setAffniv(tO, v)
       tO.affniv =v;
     end
-   %________
+    %_____________________
     function setTri(tO, v)
       tO.tri =v;
     end
-   %___________________________________
-   % retourne une structure dont les
-   % champs sont les propriétés de la classe
-   %________
+
+    %___________________________________
+    % retourne une structure dont les
+    % champs sont les propriÃ©tÃ©s de la classe
+    %-----------------------
     function v =databrut(tO)
       v =CDefautFncBase.databrut(tO, class(tO));
     end
-   %___________________________________
-   % initialise la classe à partir d'une structure
-   %________
+
+    %___________________________________
+    % initialise la classe Ã  partir d'une structure
+    %______________________
     function initial(tO, v)
+      % Comme nos propriÃ©tÃ©s sont "protected", on ne peut utiliser:
+      % CDefautFncBase.initial(tO, class(tO), v);
+      %
       % On s'assure que v est une STRUCT
       if ~isempty(v) & isa(v, 'struct')
-        % Création d'un objet "tO"
+        % CrÃ©ation d'un objet "tO"
         S =str2func(class(tO));
         hType =S();
         % Lecture de ses properties
@@ -71,20 +82,23 @@ classdef CParamMark < handle
         end
       end
     end
-   %___________________________________
-   % retourne un objet de la classe CParamMark
-   %________
+
+    %__________________________________________
+    % retourne un objet de la classe CParamMark
+    %---------------------
     function v =savePM(tO)
-      v =CDefautFcnBase.copie(tO);
+      v =CDefautFncBase.copie(tO);
     end
-   %___________________________________
-   % initialise à partir d'un objet CParamMark
-   % ne devrait plus être utilisé
-   %________
+
+    %__________________________________________
+    % initialise Ã  partir d'un objet CParamMark
+    % ne devrait plus Ãªtre utilisÃ©
+    %------------------------
     function restorePM(tO, v)
       if isa(v, class(tO))
         tO.initial(v.databrut());
       end
     end
-  end
-end
+
+  end % method
+end % classdef
