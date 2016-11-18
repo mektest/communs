@@ -1,38 +1,53 @@
 %
 % Classe CHdchnl
-% Ent�te des fichiers Analyse
+% Entête des fichiers Analyse
+% contiendra les infos sur les canaux/essais
 %
+% Ici on hérite des fonction de la classe CGestionBase
 %
-classdef CHdchnl < handle
+
+classdef CHdchnl < CGestionBase
+
   properties
-    Listadname    % {nad}  ne sera pas sauvegard�
-    adname;       % {nad}
-    cindx;        % {nad}
-    sweeptime;    % (nad, ess)
-    rate;         % (nad, ess)
-    nsmpls;       % (nad, ess)
-    max;          % (nad, ess)
-    min;          % (nad, ess)
-    npoints;      % (nad, ess)
-    point;        % (nad, ess)
-    frontcut;     % (nad, ess)
-    numstim;      % (ess)
-    comment;      % {nad, ess}
-  end %properties
-  %------
+    %                    nad   est le nombre total de canaux
+    %                    ess   est le nombre total d'essai
+    Listadname =[];   % {nad}  ne sera pas sauvegardé
+    adname =[];       % {nad}
+    cindx =[];        % {nad}
+    sweeptime =[];    % (nad, ess)
+    rate =[];         % (nad, ess)
+    nsmpls =[];       % (nad, ess)
+    max =[];          % (nad, ess)
+    min =[];          % (nad, ess)
+    npoints =[];      % (nad, ess)
+    point =[];        % (nad, ess)
+    frontcut =[];     % (nad, ess)
+    numstim =[];      % (ess)
+    comment =[];      % {nad, ess}
+  end
+
   methods
-    function initial(obj, Hd)
-      if isa(Hd, 'struct')
-        a =properties(obj);
-        for U =1:length(a)
-          if isfield(Hd, a{U})
-            obj.(a{U}) =Hd.(a{U});
-          end
-        end
-        obj.ResetListAdname();
-      end
+
+    %------------
+    % CONSTRUCTOR
+    %----------------------
+    function tO = CHdchnl()
+      tO.monnom ='CHdchnl';
     end
-    %-------
+
+    %-----------------------------------------
+    % On initialise les valeurs des propriétés
+    % à partir d'une structure (Hd)
+    %------------------------
+    function initial(obj, Hd)
+      initial@CGestionBase(obj, Hd);
+      obj.ResetListAdname();
+    end
+
+    %------------------------------------
+    % On rebâti la propriété "Listadname"
+    % afin de faire une liste des noms de canaux avec un numéro
+    %----------------------------
     function ResetListAdname(obj)
       obj.Listadname =obj.adname;
       for U =1:length(obj.adname)
@@ -45,41 +60,41 @@ classdef CHdchnl < handle
         end
       end
     end
-    %-------
+
+    %-------------------------
     function Hd =databrut(obj)
-      a =properties(obj);
-      for U =1:length(a)
-        Hd.(a{U}) =obj.(a{U});
-      end
-      Hd =rmfield(Hd, 'Listadname');
+      Hd =databrut@CGestionBase(obj);
+      Hd =rmfield(Hd, 'Listadname', 'monnom');
     end
+
     %
     function clone =copie(obj)
-      clone =CHdchnl();
-      clone.initial(obj.databrut());
+      clone =copie@CGestionBase(obj);
     end
+
     %___________________________________________________________________________
     %
-    % FONCTION POUR V�RIFIER LA GRANDEUR DES DIFF�RENTES PROPRI�T�S DE LA CLASSE.
-    % ON COMMENCE PAR COUPER L'EXC�DENT EN CANAUX ET ESSAIS, PUIS ON VOIT �
+    % FONCTION POUR VÉRIFIER LA DIMENSION DES DIFFÉRENTES PROPRIÉTÉS DE LA CLASSE.
+    % ON COMMENCE PAR COUPER L'EXCÉDENT EN CANAUX ET ESSAIS, PUIS ON VOIT À
     % COMBLER SI IL MANQUE DES INFOS SUR LES CANAUX OU ESSAIS.
     %
-    % EN ENTR�E: (NOMBRE_DE_CANAUX, NOMBRE_ESSAIS)
+    % EN ENTRÉE: (NOMBRE_DE_CANAUX, NOMBRE_ESSAIS)
     %---------------------------------------------------------------------------
     function VerifSize(tO, CAN, ESS)
       if CAN < 1 | ESS < 1
         return;
       end
-      %ON COMMENCE PAR ENLEVER L'EXC�DENT
+      %ON COMMENCE PAR ENLEVER L'EXCÉDENT
       tO.couperExcedentCanEss(CAN, ESS);
 
       %PUIS ON COMBLE SI ON EST EN MANQUE
       tO.comblerCanEss(CAN, ESS);
     end
+
     %___________________________________________________________________________
     %
-    % FONCTION POUR COUPER L'EXC�DENT EN CANAUX ET ESSAIS.
-    %
+    % FONCTION POUR COUPER L'EXCÉDENT EN CANAUX ET ESSAIS.
+    % EN ENTRÉE: (NOMBRE_DE_CANAUX, NOMBRE_ESSAIS)
     %---------------------------------------------------------------------------
     function couperExcedentCanEss(tO, Nad, Ess)
       tO.adname(Nad+1:end) =[];
@@ -104,11 +119,13 @@ classdef CHdchnl < handle
       tO.frontcut(:, Ess+1:end) =[];
       tO.comment(:, Ess+1:end) =[];
     end
+
     %___________________________________________________________________________
     %
     % FONCTION POUR COMBLER SI IL MANQUE DES INFOS SUR LES CANAUX OU ESSAIS.
-    % ON NE TOUCHERA PAS AUX NOMS DE CANAUX CAR �A IMPLIQUE TROP DE CHANGEMENTS.
+    % ON NE TOUCHERA PAS AUX NOMS DE CANAUX CAR ÇA IMPLIQUE TROP DE CHANGEMENTS.
     %
+    % EN ENTRÉE: (NOMBRE_DE_CANAUX, NOMBRE_ESSAIS)
     %---------------------------------------------------------------------------
     function comblerCanEss(tO, Nad, Ess)
       if size(tO.sweeptime, 1) < Nad
@@ -166,13 +183,18 @@ classdef CHdchnl < handle
         tO.comment(:, end+1:Ess) ={[]};
       end
     end
-    %-------
+
+    %------------------------------------------
+    % Fonction pour dupliquer les canaux lescan
+    % EN ENTRÉE: ([NUMÉRO DE CANAUX À DUPLIQUER])
+    %--------------------------
     function duplic(obj,lescan)
       nbcan =length(lescan);
       for U =1:nbcan
         obj.adname{end+1} =obj.adname{lescan(U)};
         obj.cindx{end+1} =obj.nouvnom();
       end
+      % comme on modifie le nombre de canaux, on rebâti la liste
       obj.ResetListAdname();
       obj.sweeptime(end+1:end+nbcan,:) =obj.sweeptime(lescan,:);
       obj.rate(end+1:end+nbcan,:) =obj.rate(lescan,:);
@@ -184,12 +206,17 @@ classdef CHdchnl < handle
       obj.frontcut(end+1:end+nbcan,:) =obj.frontcut(lescan,:);
       obj.comment(end+1:end+nbcan,:) =obj.comment(lescan,:);
     end
-    %-------
+
+    %-----------------------
+    % ajouter "nbcan" canaux
+    % EN ENTRÉE: (NOMBRE_DE_CANAUX_A_AJOUTER)
+    %----------------------------
     function ajoutcan(obj, nbcan)
       for U =1:nbcan
         obj.adname{end+1} ='Nouveau canal';
         obj.cindx{end+1} =obj.nouvnom();
       end
+      % comme on modifie le nombre de canaux, on rebâti la liste
       obj.ResetListAdname();
       obj.sweeptime(end+1:end+nbcan,:) =1;
       obj.rate(end+1:end+nbcan,:) =1;
@@ -201,19 +228,24 @@ classdef CHdchnl < handle
       obj.frontcut(end+1:end+nbcan,:) =0;
       obj.comment(end+1:end+nbcan,:) ={[]};
     end
-    %---------------------------------------------
-    % V contient la matrice des canaux � supprimer
-    %-------
+
+    %----------------------
+    % Suppression de canaux
+    % V contient la matrice des canaux à supprimer
+    %
+    % ex.  tO.SuppCan([1 5 7]);
+    %----------------------
     function SuppCan(tO, V)
       nbcan =length(tO.adname);
       if sum(V > nbcan) > 0
-        disp('erreur dans les canaux � enlever');
+        disp('erreur dans les canaux à enlever');
         return;
       end
     	tmp =1:nbcan;
     	tmp(V) =[];
       tO.adname =tO.adname(tmp);
       tO.cindx =tO.cindx(tmp);
+      % comme on modifie le nombre de canaux, on rebâti la liste
       tO.ResetListAdname();
       tO.sweeptime(V,:) =[];
       tO.rate(V,:) =[];
@@ -225,7 +257,11 @@ classdef CHdchnl < handle
       tO.frontcut(V,:) =[];
       tO.comment =tO.comment(tmp,:);
     end
-    %-------
+
+    %-----------------------------------------
+    % Ajoute des essai dans le fichier courant
+    % EN ENTRÉE: (NOMBRE_D'ESSAI_A_AJOUTER)
+    %----------------------------
     function ajoutess(obj, nbess)
       if nbess < 1
         return;
@@ -241,7 +277,12 @@ classdef CHdchnl < handle
       obj.numstim(end+1:end+nbess) =0;
       obj.comment(:,end+1:end+nbess) ={[]};
     end
-    %-------
+
+    %----------------------------------------------
+    % Forger un nouveau NOM UNIQUE pour la variable
+    % du prochain canal à ajouter ou renommer.
+    %
+    %---------------------------
     function lenom =nouvnom(obj)
       vL =1;
       for V =1:length(obj.cindx)
@@ -295,5 +336,6 @@ classdef CHdchnl < handle
       end
       lenom =tt;
     end
+
   end  %methods
 end  %classdef
