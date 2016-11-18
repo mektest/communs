@@ -2,55 +2,81 @@
 % classdef CPtchnl < handle
 %
 % METHODS
-%  obj =CPtchnl(src)
-%       EnlevePoint(obj, ess, canal, pt)
-%       EnlevePointetLien(obj, ess, canal, pt)
-%       EnleveLien(obj, canal, pt)
-%   ss =get.Dato(obj)
-%       initial(obj, Pt)
-%       inserepoint(obj,canal,essai,point,temps,type)
-%       marqettyp(obj,canal,essai,point,temps,type)
-%       marquage(obj,canal,essai,point,temps)
-%   pt =Onmark(obj,canal,essai,pt,temps)
-%   lp =Onmarktyp(obj,canal,essai,point,temps,type)
-%       OnTrie(obj,canal,essai)
-%       PointBidon(obj, ess, canal, pt)
-%    s =valeurDePoint(obj,texte,can,ess)
-%    s =ValeurDeTemps(obj, texte, can, ess)
-%   ss =verifPt3(obj, v, can, ess)        % "obj" est fourni par l'appelant
+%  obj = CPtchnl(src)
+%        EnlevePoint(obj, ess, canal, pt)
+%        EnlevePointetLien(obj, ess, canal, pt)
+%        EnleveLien(obj, canal, pt)
+%   ss = get.Dato(obj)
+%        initial(obj, Pt)
+%        inserepoint(obj,canal,essai,point,temps,type)
+%        marqettyp(obj,canal,essai,point,temps,type)
+%        marquage(obj,canal,essai,point,temps)
+%   pt = Onmark(obj,canal,essai,pt,temps)
+%   lp = Onmarktyp(obj,canal,essai,point,temps,type)
+%        OnTrie(obj,canal,essai)
+%        PointBidon(obj, ess, canal, pt)
+%    s = valeurDePoint(obj,texte,can,ess)
+%    s = ValeurDeTemps(obj, texte, can, ess)
+%   ss = verifPt3(obj, v, can, ess)
 %
 % METHODS STATIC
-% [v, u] =retretted3(Texto, u)
+% [v, u] = retretted3(Texto, u)
 %
 % On pourrait faire une fonction DUPLIC: un canal vers plusieurs ou
 %    N canal vers N canal... ptchnl.duplic(Vcan,Ncan) ...
 %
+
 classdef CPtchnl < handle
+
   properties
-    Dato;
-    Ofich;
-  end %properties
-  %
+    Ofich =[];     % handle du fichier en cause
+    Dato =[];      % contiendra la matrice des indices de point marqu√©
+                   %   Dato(a, b, c) est de dimension 3
+                   %   Dato(a, b, 1) contient les valeurs/index des points marqu√©s
+                   %                 (On garde l'indice et non le temps en sec.)
+                   %   Dato(a, b, 2) contient le type de point marqu√©
+                   %                -1 --> bidon
+                   %                 0 --> r√©gulier (par d√©faut)
+                   %                 1 --> Fm√©d
+                   %                 2 --> Fmoy
+                   %                 3 --> Fmax
+                   %
+                   % hdchnl.point(can,tri) contient le num√©ro de la colonne (le b dans Dato)
+                   % 
+  end
+
   methods
+
+    %____________
+    % CONSTRUCTOR
+    %-------------------------
     function obj =CPtchnl(src)
       obj.Ofich =src;
     end
-    %-------
+
+    %-----------------------------------------------
+    % Ici on ne fait pas de v√©rification sur le type
+    % ou le contenu, mis √† part isempty()
+    %------------------------
     function initial(obj, Pt)
       if ~isempty(Pt)
         obj.Dato =int32(Pt);
       end
     end
-    %-------
+
+    %_______
+    % GETTER
+    %-------------------------
     function ss =get.Dato(obj)
       ss =obj.Dato;
     end
+
     %-------
     function marqettyp(obj,canal,essai,point,temps,type)
       cnull =obj.Onmarktyp(canal,essai,point,temps,type);
     end
     % 
-    % Tous les pts marquÈs sont gardÈs dans ptchnl. On garde l'indice et non le temps en sec.
+    % Tous les pts marqu√©s sont gard√©s dans ptchnl. On garde l'indice et non le temps en sec.
     % hdchnl.point(can,tri) contient le # de la colonne dans ptchnl
     %-------
     function marquage(obj,canal,essai,point,temps)
@@ -64,7 +90,7 @@ classdef CPtchnl < handle
     %-------
     function pt =Onmark(obj,canal,essai,pt,temps)
       hdchnl =obj.Ofich.Hdchnl;
-      if pt   % on Ècrit sur le point "point"
+      if pt   % on √©crit sur le point "point"
         if hdchnl.npoints(canal,essai) == 0
           hdchnl.point(canal,essai) =size(obj.Dato,2)+1;
           obj.Dato(1:pt,hdchnl.point(canal,essai),2) =-1;
@@ -75,7 +101,7 @@ classdef CPtchnl < handle
         end
         obj.Dato(pt,hdchnl.point(canal,essai),2) =0;
         obj.Dato(pt,hdchnl.point(canal,essai),1) =temps;
-      else       % on crÈ un nouveau point
+      else       % on cr√© un nouveau point
         hdchnl.npoints(canal,essai) =hdchnl.npoints(canal,essai) +1;
         pt =hdchnl.npoints(canal,essai);
         if pt == 1
@@ -141,21 +167,21 @@ classdef CPtchnl < handle
     end
     %-------
     function PointBidon(obj, ess, canal, pt)
-      % (Est appelÈ de l'extÈrieur)
+      % (Est appel√© de l'ext√©rieur)
       hdchnl =obj.Ofich.Hdchnl;
       obj.Dato(pt,hdchnl.point(canal, ess),2) =-1;
       obj.EnleveLien(canal, pt);
     end
     %-------
     function s =valeurDePoint(obj,texte,can,ess)
-      % (Est appelÈ de l'extÈrieur)
-      % On dÈcortique la valeur d'un point
-      % ON V…RIFIE texte et retourne la valeur en Èchantillon
-      % Èvolution nov-2012
-      % On peut maintenant donnÈ comme valeur de point: P1+(Pf-Pi)/10
+      % (Est appel√© de l'ext√©rieur)
+      % On d√©cortique la valeur d'un point
+      % ON V√âRIFIE texte et retourne la valeur en √©chantillon
+      % √©volution nov-2012
+      % On peut maintenant donn√© comme valeur de point: P1+(Pf-Pi)/10
       try
         m =obj.valeurDeTemps(texte,can,ess);
-        % On retourne le rÈsultat en nb d'Èchantillon
+        % On retourne le r√©sultat en nb d'√©chantillon
         s =obj.temps2Echantillon(m,can,ess);
       catch e
         lesMots =sprintf('Erreur dans la fonction: %s\n%s (Canal: %d)|(Essai: %d)', ...
@@ -166,12 +192,12 @@ classdef CPtchnl < handle
     end
     %-------
     function s =valeurDeTemps(obj, texte, can, ess)
-      % (Est appelÈ de l'extÈrieur)
-      % On dÈcortique une valeur d'interval temporel
-      % ON V…RIFIE texte et retourne la valeur en temps (sec)
-      % On peut maintenant donnÈ comme valeur de point: (Pf-Pi)/10
+      % (Est appel√© de l'ext√©rieur)
+      % On d√©cortique une valeur d'interval temporel
+      % ON V√âRIFIE texte et retourne la valeur en temps (sec)
+      % On peut maintenant donn√© comme valeur de point: (Pf-Pi)/10
       try
-        % On retourne le rÈsultat en secondes
+        % On retourne le r√©sultat en secondes
         s =obj.tretted3(texte,can,ess);
       catch e
         lesMots =sprintf('Erreur dans la fonction: %s\n%s (Canal: %d)|(Essai: %d)', ...
@@ -187,7 +213,7 @@ classdef CPtchnl < handle
       rate =hdchnl.rate(can,ess);
       v =round((tiempo-fcut)*rate);
       if v < 0
-        me =MException('COMMUNS:CPtchnl:temps2Echantillon', '…chantillon infÈrieure ‡ ZÈro, attention au frontcut');
+        me =MException('COMMUNS:CPtchnl:temps2Echantillon', '√âchantillon inf√©rieure √† Z√©ro, attention au frontcut');
         throw(me);
       elseif v == 0
         v =1;
@@ -196,15 +222,15 @@ classdef CPtchnl < handle
     %-------
     function tt =tretted3(tO, TT, can, ess)
       % gestion des string lu lorsque l'on a un temps ou un point
-      % la string devrait avoir ÈtÈ soumis ‡: isSyntaxBornesValid
+      % la string devrait avoir √©t√© soumis √†: isSyntaxBornesValid
       if ~isSyntaxBorneValid(TT)
         me =MException('COMMUNS:CPtchnl:tretted3', 'Syntaxe (%s) non valide', TT);
         throw(me);
       end
-      % ON ENL»VE LES BLANK
+      % ON ENL√àVE LES BLANK
       pat ='\s+';
       TT =regexprep(TT, pat, '');
-      if isempty(regexpi(TT, 'p')) && isempty(str2num(TT))  % pas de "p" mais d'autres caractËres
+      if isempty(regexpi(TT, 'p')) && isempty(str2num(TT))  % pas de "p" mais d'autres caract√®res
         me =MException('COMMUNS:CPtchnl:tretted3', ['L''expression: %s n''est pas valide'], TT);
         throw(me);
       else
@@ -242,7 +268,7 @@ classdef CPtchnl < handle
     end
     %-------
     function ss =verifPt3(obj, v, can, ess)
-      % On retourne la rÈponse en sec
+      % On retourne la r√©ponse en sec
       hdchnl =obj.Ofich.Hdchnl;
       fcut =hdchnl.frontcut(can,ess);
       rate =hdchnl.rate(can,ess);
@@ -264,18 +290,18 @@ classdef CPtchnl < handle
     end
   end  %methods
   %------------------------------------------------------------
-  % ATTENTION: le "thisObject" devra Ítre fourni par l'appelant
-  % car la classe ne le fourni pas aux mÈthodes Static
+  % ATTENTION: le "thisObject" devra √™tre fourni par l'appelant
+  % car la classe ne le fourni pas aux m√©thodes Static
   %---------------
   methods (Static)
     %---------------------------------------------
-    % L'indicateur "u" pointe sur un caractËre "p"
+    % L'indicateur "u" pointe sur un caract√®re "p"
     % en arrivant dans cette fonction
     %-------
     function [v, u] =retretted3(Texto, u)
       u =u+1;
       v ='';
-      if u > length(Texto)     % le "p" Ètait le dernier char
+      if u > length(Texto)     % le "p" √©tait le dernier char
         return;
       end
       if strcmpi(Texto(u), 'i') || strcmp(Texto(u), '0')
