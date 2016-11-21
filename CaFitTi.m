@@ -1,7 +1,7 @@
 
-%
+% g
 % Ici on check si lapos peut fitter dans le moniteur
-% en fonction d'un point de référence donné par le coin
+% en fonction d'un point de rÃ©fÃ©rence donnÃ© par le coin
 % bas-gauche de la fenref
 %
 function V =CaFitTi(fenref, lapos)
